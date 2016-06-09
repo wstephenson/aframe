@@ -15,10 +15,13 @@ module.exports.Component = registerComponent('wasd-controls', {
     fly: { default: false },
     wsAxis: { default: 'z', oneOf: [ 'x', 'y', 'z' ] },
     adAxis: { default: 'x', oneOf: [ 'x', 'y', 'z' ] },
+    qzAxis: { default: 'y', oneOf: [ 'x', 'y', 'z' ] },
     wsInverted: { default: false },
     wsEnabled: { default: true },
     adInverted: { default: false },
-    adEnabled: { default: true }
+    adEnabled: { default: true },
+    qzInverted: { default: false },
+    qzEnabled: { default: true }
   },
 
   init: function () {
@@ -45,8 +48,10 @@ module.exports.Component = registerComponent('wasd-controls', {
     var movementVector;
     var adAxis = data.adAxis;
     var wsAxis = data.wsAxis;
+    var qzAxis = data.qzAxis;
     var adSign = data.adInverted ? -1 : 1;
     var wsSign = data.wsInverted ? -1 : 1;
+    var qzSign = data.qzInverted ? -1 : 1;
     var el = this.el;
     this.prevTime = time;
 
@@ -54,11 +59,13 @@ module.exports.Component = registerComponent('wasd-controls', {
     if (previousData || delta > MAX_DELTA) {
       velocity[adAxis] = 0;
       velocity[wsAxis] = 0;
+      velocity[qzAxis] = 0;
       return;
     }
 
     velocity[adAxis] -= velocity[adAxis] * easing * delta;
     velocity[wsAxis] -= velocity[wsAxis] * easing * delta;
+    velocity[qzAxis] -= velocity[qzAxis] * easing * delta;
 
     var position = el.getComputedAttribute('position');
 
@@ -68,8 +75,12 @@ module.exports.Component = registerComponent('wasd-controls', {
         if (keys[68]) { velocity[adAxis] += adSign * acceleration * delta; } // Right
       }
       if (data.wsEnabled) {
-        if (keys[87]) { velocity[wsAxis] -= wsSign * acceleration * delta; } // Up
-        if (keys[83]) { velocity[wsAxis] += wsSign * acceleration * delta; } // Down
+        if (keys[87]) { velocity[wsAxis] -= wsSign * acceleration * delta; } // Forward
+        if (keys[83]) { velocity[wsAxis] += wsSign * acceleration * delta; } // Backward
+      }
+      if (data.qzEnabled) {
+        if (keys[90]) { velocity[qzAxis] -= qzSign * acceleration * delta; } // Down
+        if (keys[81]) { velocity[qzAxis] += qzSign * acceleration * delta; } // Up
       }
     }
 
